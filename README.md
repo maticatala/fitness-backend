@@ -6,13 +6,14 @@
 
 1. Clonar proyecto
 2. `npm install`
-3. Levantar la base de datos
+3. Crear documento .env a partir de .env-template y establecer las variables
+4. Levantar la base de datos
 
 ```
 docker-compose up -d
 ```
 
-4. Levantar:
+5. Levantar:
 
 ```
 npm run start:dev
