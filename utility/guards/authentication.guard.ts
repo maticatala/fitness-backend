@@ -31,6 +31,9 @@ export class AuthenticationGuard implements CanActivate {
 
       const currentUser = await this.authService.findOne(payload['id']);
 
+      if (currentUser['username'] !== process.env.ADMIN_USERNAME)
+        throw new Error();
+
       request['user'] = currentUser;
     } catch (error) {
       throw new UnauthorizedException();
