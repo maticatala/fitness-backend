@@ -17,6 +17,8 @@ export class WorkoutLogsController {
   constructor(private readonly workoutLogsService: WorkoutLogsService) {}
 
   // Público: lo llama Google Apps Script
+
+  @UseGuards(AuthenticationGuard)
   @Post()
   create(@Body() createWorkoutLogDto: CreateWorkoutLogDto) {
     return this.workoutLogsService.create(createWorkoutLogDto);

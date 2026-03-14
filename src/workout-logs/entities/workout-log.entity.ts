@@ -6,10 +6,10 @@ export class WorkoutLog {
   email: string;
 
   @Prop({ required: true })
-  trainedToday: boolean;
+  trainedToday: string;
 
-  @Prop()
-  workoutType: string;
+  @Prop({ type: [String], default: [] })
+  workoutType: string[];
 
   @Prop()
   duration: string;

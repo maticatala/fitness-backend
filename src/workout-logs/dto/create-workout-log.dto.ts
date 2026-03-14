@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsBoolean,
   IsDateString,
   IsEmail,
@@ -10,12 +11,13 @@ export class CreateWorkoutLogDto {
   @IsEmail()
   email: string;
 
-  @IsBoolean()
-  trainedToday: boolean;
-
   @IsString()
+  trainedToday: string;
+
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  workoutType?: string;
+  workoutType?: string[];
 
   @IsString()
   @IsOptional()
