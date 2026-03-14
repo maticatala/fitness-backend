@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 import * as bcryptjs from 'bcryptjs';
 
@@ -16,20 +20,31 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
+  async findAll() {
+    return await this.userModel.find();
+  }
+
+  async findOne(userId: string) {
+    const user = await this.userModel.findById(userId);
+    if (!user) return new NotFoundException('');
+    const { password, ...rest } = user.toJSON();
+    return rest;
+  }
+
   async getToken(loginUserDto: CreateUserDto) {
     const { username, password } = loginUserDto;
 
-    const userFounded = await this.userModel.findOne({
+    const userFound = await this.userModel.findOne({
       username: username,
     });
 
-    if (!userFounded)
+    if (!userFound)
       throw new UnauthorizedException('No se encontro el usuario');
 
-    if (!bcryptjs.compareSync(password, userFounded.password))
+    if (!bcryptjs.compareSync(password, userFound.password))
       throw new UnauthorizedException('Las credenciales no son validas');
 
-    const { password: _, ...user } = userFounded.toJSON();
+    const { password: _, ...user } = userFound.toJSON();
 
     return { user, token: this.createJwt({ id: user._id.toString() }) };
   }
