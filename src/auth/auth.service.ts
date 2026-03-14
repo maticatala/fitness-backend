@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+
+import * as bcryptjs from 'bcryptjs';
+
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './interfaces/jwt-payload';
+import { CreateUserDto } from './dto/create-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './entities/user.entity';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private jwtService: JwtService,
+  ) {}
+
+  async getToken(loginUserDto: CreateUserDto) {
+    const { username, password } = loginUserDto;
+
+    const userFounded = await this.userModel.findOne({
+      username: username,
+    });
+
+    if (!userFounded)
+      throw new UnauthorizedException('No se encontro el usuario');
+
+    if (!bcryptjs.compareSync(password, userFounded.password))
+      throw new UnauthorizedException('Las credenciales no son validas');
+
+    const { password: _, ...user } = userFounded.toJSON();
+
+    return { user, token: this.createJwt({ id: user._id.toString() }) };
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  private createJwt(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 }
