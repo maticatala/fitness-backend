@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 
 import { SeedModule } from './seed/seed.module';
+import { WorkoutLogsModule } from './workout-logs/workout-logs.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { SeedModule } from './seed/seed.module';
     MongooseModule.forRoot(process.env.MONGO_URI!),
     AuthModule,
     SeedModule,
+    WorkoutLogsModule,
   ],
 })
 export class AppModule {}
