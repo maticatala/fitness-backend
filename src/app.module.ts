@@ -1,15 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { AuthModule } from './auth/auth.module';
+
+import { SeedModule } from './seed/seed.module';
 
 @Module({
-  //Importar librerias de terceros primero
   imports: [
     ConfigModule.forRoot(),
-
     MongooseModule.forRoot(process.env.MONGO_URI!),
+    AuthModule,
+    SeedModule,
   ],
-  controllers: [],
-  providers: [],
 })
 export class AppModule {}
