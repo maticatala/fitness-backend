@@ -44,14 +44,14 @@ export class WorkoutLogsService {
     const logs = await this.workoutLogModel.find(filter);
 
     const totalSubmissions = logs.length;
-    const totalTrained = logs.filter(
-      (l) => l.trainedToday === 'Si, completé mi entrenamiento.',
+    const totalTrained = logs.filter((l) =>
+      this.matchesTrained(l.trainedToday),
     ).length;
-    const totalPartial = logs.filter(
-      (l) => l.trainedToday === 'Entrenamiento parcial/ligero.',
+    const totalPartial = logs.filter((l) =>
+      this.matchesPartial(l.trainedToday),
     ).length;
-    const totalNotTrained = logs.filter(
-      (l) => l.trainedToday === 'No, no entrené hoy.',
+    const totalNotTrained = logs.filter((l) =>
+      this.matchesNotTrained(l.trainedToday),
     ).length;
     const attendanceRate = totalSubmissions
       ? +((totalTrained / totalSubmissions) * 100).toFixed(1)
@@ -100,5 +100,30 @@ export class WorkoutLogsService {
     );
     if (!log) throw new NotFoundException('Registro no encontrado');
     return log;
+  }
+
+  // workout-logs.service.ts
+
+  private normalizeAnswer(answer: string): string {
+    return answer
+      ?.trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  private matchesTrained(answer: string): boolean {
+    const n = this.normalizeAnswer(answer);
+    return n.includes('complete') || n.includes('si,') || n.startsWith('si ');
+  }
+
+  private matchesPartial(answer: string): boolean {
+    const n = this.normalizeAnswer(answer);
+    return n.includes('parcial') || n.includes('ligero');
+  }
+
+  private matchesNotTrained(answer: string): boolean {
+    const n = this.normalizeAnswer(answer);
+    return n.includes('no entre') || n.includes('no,');
   }
 }
